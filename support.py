@@ -3,6 +3,10 @@ import numpy as np
 from shapely.geometry import Polygon 
 from settings import *
 
+
+def draw_menu(screen, dimension):
+    screen.fill("black")
+
 #2D
 def create_2Dpolygon(vertex_count, radius):
     n, r = vertex_count, radius
