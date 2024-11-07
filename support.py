@@ -1,16 +1,12 @@
 import pygame as pg
 import numpy as np
 from shapely.geometry import Polygon 
-from settings import *
 
-
-def draw_menu(screen, dimension):
-    screen.fill("black")
 
 #2D
-def create_2Dpolygon(vertex_count, radius):
+def create_2Dpolygon(vertex_count, radius, width, height):
     n, r = vertex_count, radius
-    x, y = WIDTH//2, HEIGHT//2
+    x, y = width//2, height//2
     return np.array([(x + r*np.cos(2*np.pi*i/n), y + r*np.sin(2*np.pi*i/n)) for i in range(n)])
 
 def draw_2Dshape(screen, points, center):
@@ -28,15 +24,15 @@ def rotate2D(screen, points, center, rot_matrix):
     draw_2Dshape(screen, rotated_points, center)
 
 # 3D
-def createCube(center):
-    a = np.array([-1, -1, -1])*(WIDTH//4) + center
-    b = np.array([1, -1, -1])*(WIDTH//4) + center
-    c = np.array([1, 1, -1])*(WIDTH//4) + center
-    d = np.array([-1, 1, -1])*(WIDTH//4) + center
-    e = np.array([-1, -1, 1])*(WIDTH//4) + center
-    f = np.array([1, -1, 1])*(WIDTH//4) + center
-    g = np.array([1, 1, 1])*(WIDTH//4) + center
-    h = np.array([-1, 1, 1])*(WIDTH//4) + center
+def createCube(center, width):
+    a = np.array([-1, -1, -1])*(width//5) + center
+    b = np.array([1, -1, -1])*(width//5) + center
+    c = np.array([1, 1, -1])*(width//5) + center
+    d = np.array([-1, 1, -1])*(width//5) + center
+    e = np.array([-1, -1, 1])*(width//5) + center
+    f = np.array([1, -1, 1])*(width//5) + center
+    g = np.array([1, 1, 1])*(width//5) + center
+    h = np.array([-1, 1, 1])*(width//5) + center
     return np.array([a, b, c, d, e, f, g, h])
 
 def drawCube(screen, vertex):
@@ -67,28 +63,38 @@ def rotateCube(screen, points, center, rot_matrix):
         points[i] = rot_matrix @ points[i]  
     return points + center
 
-def create3DrotationMatrix(theta):
-    rot_matrix_z = np.array([
-                            [np.cos(theta), -np.sin(theta), 0],
-                            [np.sin(theta), np.cos(theta), 0],
-                            [0, 0, 1]
-                            ])
+def create3DrotationMatrix(theta, axis):
+    
+    if axis[0]:
+        rot_matrix_x = np.array([
+                                [1, 0, 0],
+                                [0, np.cos(theta), -np.sin(theta)],
+                                [0, np.sin(theta), np.cos(theta)]
+                                ])
+    else:
+        rot_matrix_x = np.eye(3)
 
-    rot_matrix_y = np.array([
+    if axis[1]:
+        rot_matrix_y = np.array([
                             [np.cos(theta), 0, np.sin(theta)],
                             [0, 1, 0],
                             [-np.sin(theta), 0, np.cos(theta)]
                             ])
-
-    rot_matrix_x = np.array([
-                            [1, 0, 0],
-                            [0, np.cos(theta), -np.sin(theta)],
-                            [0, np.sin(theta), np.cos(theta)]
-                            ])
-
+    else:
+        rot_matrix_y = np.eye(3)
+    
+    if axis[2]:
+        rot_matrix_z = np.array([
+                                [np.cos(theta), -np.sin(theta), 0],
+                                [np.sin(theta), np.cos(theta), 0],
+                                [0, 0, 1]
+                                ])
+    else:
+        rot_matrix_z = np.eye(3)
+    
     return rot_matrix_x, rot_matrix_y, rot_matrix_z
 
-def rotate3D(screen, points, center, rot_matrix, proj_matrix):
+def rotate3D(screen, points, center, rot_matrix, proj_matrix, width, height):
     rotated_points = rotateCube(screen, points, center, rot_matrix)
-    projected_points = project_points(rotated_points, proj_matrix) + [WIDTH//6, -HEIGHT//8, 0]
+    projected_points = project_points(rotated_points, proj_matrix) + [width//6, -height//8, 0]
     drawCube(screen, projected_points)
