@@ -17,7 +17,7 @@ class Rotation:
         self.dimension = 2
         self.vertex_count = 5
         self.change_vertex = 0
-        self.axis3d = np.array([1, 0, 0])
+        self.axis3d = np.array([0, 1, 0])
         self.in_menu = True
         self.is_mouse_released = False
         self.setup_menu()
